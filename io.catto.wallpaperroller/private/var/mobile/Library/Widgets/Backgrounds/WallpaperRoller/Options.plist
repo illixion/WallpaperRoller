@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+    <dict>
+        <key>name</key>
+        <string>interval</string>
+        <key>type</key>
+        <string>select</string>
+        <key>label</key>
+        <string>Change Interval</string>
+        <key>default</key>
+        <string>1. Every 15 minutes</string>
+        <key>options</key>
+        <dict>
+            <key>1. Every 15 minutes</key>
+            <string>15</string>
+            <key>2. Every 30 minutes</key>
+            <string>30</string>
+            <key>3. Every 1 hour</key>
+            <string>60</string>
+            <key>4. Every 2 hours</key>
+            <string>120</string>
+            <key>5. Every 12 hours</key>
+            <string>720</string>
+            <key>6. Every 24 hours</key>
+            <string>1440</string>
+            <key>7. Devour my battery (whenever visible)</key>
+            <string>0</string>
+        </dict>
+    </dict>
+    <dict>
+        <key>name</key>
+        <string>sensitivity</string>
+        <key>type</key>
+        <string>edit</string>
+        <key>label</key>
+        <string>Shake sensitivity (lower - more)</string>
+        <key>default</key>
+        <string>40</string>
+    </dict>
+	<dict>
+		<key>name</key>
+		<string>useOnline</string>
+		<key>type</key>
+		<string>switch</string>
+		<key>label</key>
+		<string>Enable online images (check description)</string>
+		<key>default</key>
+		<false/>
+    </dict>
+    <dict>
+        <key>name</key>
+        <string>checkURL</string>
+        <key>type</key>
+        <string>edit</string>
+        <key>label</key>
+        <string>Connection check URL</string>
+        <key>default</key>
+        <string></string>
+    </dict>
+    <dict>
+        <key>name</key>
+        <string>remoteURL</string>
+        <key>type</key>
+        <string>edit</string>
+        <key>label</key>
+        <string>Online API URL</string>
+        <key>default</key>
+        <string>https://cors-anywhere.herokuapp.com/e621.net/posts.json?tags=id:1229885&amp;limit=1</string>
+    </dict>
+    <dict>
+        <key>name</key>
+        <string>blacklist</string>
+        <key>type</key>
+        <string>edit</string>
+        <key>label</key>
+        <string>Blacklisted image tags</string>
+        <key>default</key>
+        <string></string>
+    </dict>
+</array>
+</plist>

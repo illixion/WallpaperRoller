@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+rm '/private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/WallpaperRoller.js' 2> /dev/null
+unlink '/private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/images' 2> /dev/null
+rmdir '/private/var/mobile/Library/WR_Pictures/' 2> /dev/null
+exit 0

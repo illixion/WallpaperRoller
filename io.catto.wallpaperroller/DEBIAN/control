@@ -1,0 +1,13 @@
+Package: io.catto.wallpaperroller
+Name: Wallpaper Roller
+Version: 1.0.0
+Description: Roll your own dynamic wallpaper
+Section: Themes
+Depends: com.matchstic.xenhtml(>=2.0~beta1)
+Priority: optional
+Architecture: iphoneos-arm
+Author: Manual <am@catto.io>
+dev: Manual <am@catto.io>
+Maintainer: Manual <am@catto.io>
+Depiction: https://jb.catto.io/depictions/web/?p=io.catto.wallpaperroller
+SileoDepiction: https://jb.catto.io/depictions/native/io.catto.wallpaperroller/depiction.json

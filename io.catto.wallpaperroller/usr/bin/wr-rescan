@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+cd '/private/var/mobile/Library/WR_Pictures'
+
+imageCount=0
+
+fileList="["
+for filename in *.*; do
+    [ -e "$filename" ] || continue
+    fileList+="'$filename',"
+    ((imageCount++))
+done
+fileList+="];"
+
+# Assume that that 1 image = no custom images have been added yet
+if (( imageCount > 1 )); then
+    imageCount=$((imageCount-1))
+    fileList=${fileList//\'wr_welcome.jpg\',/}
+    printf "Found and added $imageCount images\nPlease respring to apply changes (sbreload)\n"
+else
+    printf "Error: no custom images found!\nPlease make sure they're in /var/mobile/Library/WR_Pictures\n"
+fi
+
+sed -i "s/  const imageList =.*/  const imageList = $fileList/g" '/private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/WallpaperRoller.js'
+ln -s '/private/var/mobile/Library/WR_Pictures' '/private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/images' || true
