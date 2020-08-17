@@ -15,9 +15,9 @@ fileList+="];"
 if (( imageCount > 1 )); then
     imageCount=$((imageCount-1))
     fileList=${fileList//\'wr_welcome.jpg\',/}
-    printf "Found and added $imageCount images\nPlease respring to apply changes (sbreload)\n"
+    printf "Found and added $imageCount images\nPlease respring to apply changes.\n"
 else
-    printf "Error: no custom images found!\nPlease make sure they're in /var/mobile/Library/WR_Pictures\n"
+    printf "No custom images have been added yet\nPlease add your images to /var/mobile/Library/WR_Pictures\n"
 fi
 
 sed -i "s/  const imageList =.*/  const imageList = $fileList/g" '/private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/WallpaperRoller.js'
