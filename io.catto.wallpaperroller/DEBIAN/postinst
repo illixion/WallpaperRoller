@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-ln -s '/private/var/mobile/Library/WR_Pictures' '/private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/images' 2> /dev/null || true
+ln -s '/private/var/mobile/Library/WR_Pictures' '/private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/images' 2>/dev/null || true
 chmod +x /usr/bin/wr-rescan
 /usr/bin/wr-rescan
