@@ -149,13 +149,13 @@ function changeAutoWallpaperCB(bothSlots) {
   if (!useOnline) {
     if (fadeEnable) {
       setTimeout(changeLocalWallpaper(bothSlots), fadeDelay);
-    } else changeLocalWallpaper();
+    } else changeLocalWallpaper(bothSlots);
     return;
   }
   if (!checkURL) {
     if (fadeEnable) {
       setTimeout(changeOnlineWallpaper(bothSlots), fadeDelay);
-    } else changeOnlineWallpaper();
+    } else changeOnlineWallpaper(bothSlots);
     return;
   }
 
