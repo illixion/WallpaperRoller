@@ -13,6 +13,7 @@ var blacklist = typeof blacklist === 'undefined' ? '' : blacklist;
 
 var preventDoubleChange = false; // used for shaking compensation
 var elToUpdate = "bg2" // Determines which image to update next as we load 2 images at once
+var footerMap = {"bg": "bgFooter", "bg2": "bg2Footer"}
 
 var x1 = 0,
   y1 = 0,
@@ -26,7 +27,7 @@ window.onload = function () {
   // Xen HTML really likes to reload widgets in its settings,
   // so we avoid getting rate limited when user is configuring it
   this.changeLocalWallpaper(true);
-  if (!checkURL) document.getElementById('footer').innerHTML = 'Shake to load online images'
+  if (!checkURL) document.getElementById(footerMap['bg2']).innerHTML = 'Shake to load online images'
   nextUpdate = addMinutes(new this.Date(), interval);
 };
 
@@ -185,7 +186,6 @@ function changeAutoWallpaperCB(bothSlots) {
 // This is the online component, should be compatible with most modern Danbooru APIs
 // Cors-anywhere can be used as XenHTML has no CORS proxy yet
 function changeOnlineWallpaper(bothSlots) {
-  document.getElementById('footer').innerHTML = "" // TODO: temporary
   const headers = new Headers({
     Accept: 'application/json',
     'Content-Type': 'application/json',
@@ -208,20 +208,26 @@ function changeOnlineWallpaper(bothSlots) {
         });
       });
 
+      randomPost = good_posts[Math.floor(Math.random() * good_posts.length)]
+      randomPost2 = good_posts[Math.floor(Math.random() * good_posts.length)]
+
       if (bothSlots) {
         document.getElementById("bg").src =
-        good_posts[Math.floor(Math.random() * good_posts.length)]['file'][
+        randomPost['file'][
           'url'
         ];
+        document.getElementById(footerMap['bg']).innerHTML = randomPost['id']
         document.getElementById("bg2").src =
-        good_posts[Math.floor(Math.random() * good_posts.length)]['file'][
+        randomPost2['file'][
           'url'
         ];
+        document.getElementById(footerMap['bg2']).innerHTML = randomPost2['id']
       } else {
       document.getElementById(elToUpdate).src =
-        good_posts[Math.floor(Math.random() * good_posts.length)]['file'][
+        randomPost['file'][
           'url'
         ];}
+        document.getElementById(footerMap[elToUpdate]).innerHTML = randomPost['id']
     });
 }
 
@@ -230,14 +236,18 @@ function changeLocalWallpaper(bothSlots) {
   // Put files into /var/mobile/Library/WR_Pictures
   const imageList = ["wr_welcome.jpg",]
 
+
   if (bothSlots) {
     const selectBG = imageList[Math.floor(Math.random() * imageList.length)];
     document.getElementById("bg").src = 'images/' + selectBG;
+    document.getElementById(footerMap['bg']).innerHTML = ""
     const selectBG2 = imageList[Math.floor(Math.random() * imageList.length)];
     document.getElementById("bg2").src = 'images/' + selectBG2;
+    document.getElementById(footerMap['bg2']).innerHTML = ""
   } else {
     const selectBG = imageList[Math.floor(Math.random() * imageList.length)];
     document.getElementById(elToUpdate).src = 'images/' + selectBG;
+    document.getElementById(footerMap[elToUpdate]).innerHTML = ""
   }
 }
 
