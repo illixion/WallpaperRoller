@@ -26,6 +26,7 @@ window.onload = function () {
   // Xen HTML really likes to reload widgets in its settings,
   // so we avoid getting rate limited when user is configuring it
   this.changeLocalWallpaper(true);
+  if (!checkURL) document.getElementById('footer').innerHTML = 'Shake to load online images'
   nextUpdate = addMinutes(new this.Date(), interval);
 };
 
@@ -54,7 +55,7 @@ setInterval(function () {
     if (preventDoubleChange) {
       preventDoubleChange = false;
     } else {
-      changeAutoWallpaper(true);
+      changeAutoWallpaper(false);
       preventDoubleChange = true;
     }
   }
@@ -63,7 +64,7 @@ setInterval(function () {
   x2 = x1;
   y2 = y1;
   z2 = z1;
-}, 250);
+}, 200);
 
 function addMinutes(date, minutes) {
   return new Date(date.getTime() + minutes * 60000);
@@ -140,7 +141,7 @@ function fadeIn(from, to, speed, callback, bothSlots) {
 function changeAutoWallpaper(bothSlots) {
   if (!bothSlots) {
     flipFlop(changeAutoWallpaperCB, bothSlots)
-  } else changeAutoWallpaperCB()
+  } else changeAutoWallpaperCB(bothSlots)
 }
 
 // Function to change the wallpaper depending on current condition type
@@ -184,6 +185,7 @@ function changeAutoWallpaperCB(bothSlots) {
 // This is the online component, should be compatible with most modern Danbooru APIs
 // Cors-anywhere can be used as XenHTML has no CORS proxy yet
 function changeOnlineWallpaper(bothSlots) {
+  document.getElementById('footer').innerHTML = "" // TODO: temporary
   const headers = new Headers({
     Accept: 'application/json',
     'Content-Type': 'application/json',
