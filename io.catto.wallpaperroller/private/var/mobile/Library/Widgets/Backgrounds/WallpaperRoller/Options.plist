@@ -41,6 +41,36 @@
     </dict>
 	<dict>
 		<key>name</key>
+		<string>fadeEnable</string>
+		<key>type</key>
+		<string>switch</string>
+		<key>label</key>
+		<string>Enable fade effect</string>
+		<key>default</key>
+		<false/>
+    </dict>
+    <dict>
+        <key>name</key>
+        <string>fadeSpeed</string>
+        <key>type</key>
+        <string>edit</string>
+        <key>label</key>
+        <string>Fade effect speed (step speed in ms)</string>
+        <key>default</key>
+        <string>50</string>
+    </dict>
+    <dict>
+        <key>name</key>
+        <string>fadeDelay</string>
+        <key>type</key>
+        <string>edit</string>
+        <key>label</key>
+        <string>Fade effect delay (in milliseconds)</string>
+        <key>default</key>
+        <string>100</string>
+    </dict>
+	<dict>
+		<key>name</key>
 		<string>useOnline</string>
 		<key>type</key>
 		<string>switch</string>

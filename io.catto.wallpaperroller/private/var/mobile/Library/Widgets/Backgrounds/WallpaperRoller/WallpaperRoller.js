@@ -3,13 +3,16 @@ var nextUpdate;
 // Failsafes for cases where Xen decides to ignore default options :/
 var interval = typeof interval === 'undefined' ? 15 : interval;
 var sensitivity = !(parseInt(sensitivity) > 0) ? 40 : parseInt(sensitivity);
+var fadeEnable = typeof fadeEnable === 'undefined' ? false : fadeEnable;
+var fadeSpeed = !(parseInt(fadeSpeed) > 0) ? 20 : parseInt(fadeSpeed);
+var fadeDelay = !(parseInt(fadeDelay) > 0) ? 300 : parseInt(fadeDelay);
 var useOnline = typeof useOnline === 'undefined' ? false : useOnline;
 var checkURL = typeof checkURL === 'undefined' ? '' : checkURL;
 var remoteURL = typeof remoteURL === 'undefined' ? 'https://cors-anywhere.herokuapp.com/e621.net/posts.json?tags=id:1229885&limit=1' : remoteURL;
 var blacklist = typeof blacklist === 'undefined' ? '' : blacklist;
 
 var preventDoubleChange = false; // used for shaking compensation
-var elToUpdate = "bg" // Determines which image to show as we load 2 images at once
+var elToUpdate = "bg2" // Determines which image to update next as we load 2 images at once
 
 var x1 = 0,
   y1 = 0,
@@ -19,17 +22,16 @@ var x1 = 0,
   z2 = 0;
 
 window.onload = function () {
-  if (!checkURL) {
-    this.changeAutoWallpaper(true)
-  } else {
-    this.changeLocalWallpaper(true); // Xen HTML settings pane really likes to reload widgets
-  }
+  // Yes, this will ignore the online only mode on first launch
+  // Xen HTML really likes to reload widgets in its settings,
+  // so we avoid getting rate limited when user is configuring it
+  this.changeLocalWallpaper(true);
   nextUpdate = addMinutes(new this.Date(), interval);
 };
 
 window.onresume = function () {
   if (new this.Date() > nextUpdate) {
-    this.changeAutoWallpaper();
+    this.changeAutoWallpaper(false);
     nextUpdate = addMinutes(new this.Date(), interval);
   }
 };
@@ -52,7 +54,7 @@ setInterval(function () {
     if (preventDoubleChange) {
       preventDoubleChange = false;
     } else {
-      changeAutoWallpaper();
+      changeAutoWallpaper(true);
       preventDoubleChange = true;
     }
   }
@@ -98,10 +100,63 @@ function connectWebSocket(url, timeout) {
   });
 }
 
+// https://stackoverflow.com/questions/6121203/how-to-do-fade-in-and-fade-out-with-javascript-and-css
+function fadeIn(from, to, speed, callback, bothSlots) {
+  // TODO: find a better way to implement this
+  if (!fadeEnable) speed = 0
+
+  // TODO: this breaks when called during fading
+  const fromEl = document.getElementById(from);
+  const toEl = document.getElementById(to);
+  toEl.style.zIndex = 10;
+  fromEl.style.zIndex = 0;
+  if (speed === 0) {
+    toEl.style.opacity = 1;
+    toEl.style.display = 'initial';
+    fromEl.style.opacity = 0;
+    fromEl.style.display = 'none';
+    callback(bothSlots);
+    return true;
+  }
+
+  let opacity = 0.1;  // initial opacity
+  toEl.style.display = 'initial';
+  let timer = setInterval(function () {
+      if (opacity >= 1){
+          fromEl.style.display = 'none';
+          fromEl.style.opacity = 0;
+          clearInterval(timer);
+      }
+      toEl.style.opacity = opacity;
+      toEl.style.filter = 'alpha(opacity=' + opacity * 100 + ")";
+      opacity += opacity * 0.1;
+  }, speed);
+
+  callback(bothSlots);
+  return true;
+}
+
+// TODO: mmm, callback spaghetti
+function changeAutoWallpaper(bothSlots) {
+  if (!bothSlots) {
+    flipFlop(changeAutoWallpaperCB, bothSlots)
+  } else changeAutoWallpaperCB()
+}
+
 // Function to change the wallpaper depending on current condition type
-function changeAutoWallpaper(bothSlots = false) {
-  if (!useOnline) { changeLocalWallpaper(bothSlots); return; }
-  if (!checkURL) { changeOnlineWallpaper(bothSlots); return; }
+function changeAutoWallpaperCB(bothSlots) {
+  if (!useOnline) {
+    if (fadeEnable) {
+      setTimeout(changeLocalWallpaper(bothSlots), fadeDelay);
+    } else changeLocalWallpaper();
+    return;
+  }
+  if (!checkURL) {
+    if (fadeEnable) {
+      setTimeout(changeOnlineWallpaper(bothSlots), fadeDelay);
+    } else changeOnlineWallpaper();
+    return;
+  }
 
   // This checks if we're on WiFi or on cellular by connecting to a LAN HTTP server
   // like a router or any other device, and if we get a connection error 
@@ -110,25 +165,29 @@ function changeAutoWallpaper(bothSlots = false) {
     connectWebSocket(`ws://{checkURL}`, 250).catch(function (err) {
       console.log(err);
       if (err == 'Error: timeOut') {
-        changeLocalWallpaper(bothSlots);
+        if (fadeEnable) {
+          setTimeout(changeLocalWallpaper(bothSlots), fadeDelay);
+        } else changeLocalWallpaper(bothSlots);
       } else {
-        changeOnlineWallpaper(bothSlots);
+        if (fadeEnable) {
+          setTimeout(changeOnlineWallpaper(bothSlots), fadeDelay);
+        } else changeOnlineWallpaper(bothSlots);
       }
     });
   } catch (timeOut) {
-    changeOnlineWallpaper(bothSlots);
+    if (fadeEnable) {
+      setTimeout(changeOnlineWallpaper(bothSlots), fadeDelay);
+    } else changeOnlineWallpaper(bothSlots);
   }
 }
 
 // This is the online component, should be compatible with most modern Danbooru APIs
 // Cors-anywhere can be used as XenHTML has no CORS proxy yet
 function changeOnlineWallpaper(bothSlots) {
-  flipFlop();
-
   const headers = new Headers({
     Accept: 'application/json',
     'Content-Type': 'application/json',
-    'User-Agent': 'JSWallpaper/1.0 (Manual on e621)',
+    'User-Agent': 'WallpaperRoller/1.1 (+am@catto.io)',
   });
 
   fetch(remoteURL, {
@@ -165,8 +224,6 @@ function changeOnlineWallpaper(bothSlots) {
 }
 
 function changeLocalWallpaper(bothSlots) {
-  flipFlop();
-
   // This is where the image list will be generated upon WallpaperRoller (re)installation.
   // Put files into /var/mobile/Library/WR_Pictures
   const imageList = ["wr_welcome.jpg",]
@@ -183,14 +240,30 @@ function changeLocalWallpaper(bothSlots) {
 }
 
 // Switch the current image element to the hidden, pre-loaded next image
-function flipFlop() {
-  if (document.getElementById('bg').classList.length > 0) {
-    document.getElementById('bg2').classList = ['active'];
-    document.getElementById('bg').classList = [];
+function flipFlop(callback, bothSlots, speed = fadeSpeed) {
+  if (parseFloat(document.getElementById('bg2').style.opacity) === 0) {
+    const img = document.getElementById('bg2')
+
+    if (img.complete) {
+      fadeIn(from='bg', to='bg2', speed, callback, bothSlots)
+    } else {
+      img.addEventListener('load', fadeIn(from='bg', to='bg2', speed))
+      img.addEventListener('error', function() {
+        console.error('error loading image')
+      })
+    }
     elToUpdate = "bg"
   } else {
-    document.getElementById('bg').classList = ['active'];
-    document.getElementById('bg2').classList = [];
+    const img = document.getElementById('bg')
+
+    if (img.complete) {
+      fadeIn(from='bg2', to='bg', speed, callback, bothSlots)
+    } else {
+      img.addEventListener('load', fadeIn(from='bg2', to='bg', speed))
+      img.addEventListener('error', function() {
+        console.error('error loading image')
+      })
+    }
     elToUpdate = "bg2"
   }
   
