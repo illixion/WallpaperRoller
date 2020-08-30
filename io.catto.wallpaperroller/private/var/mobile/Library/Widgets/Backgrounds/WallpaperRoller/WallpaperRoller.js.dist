@@ -6,11 +6,13 @@ var sensitivity = !(parseInt(sensitivity) > 0) ? 40 : parseInt(sensitivity);
 var fadeEnable = typeof fadeEnable === 'undefined' ? false : fadeEnable;
 var fadeSpeed = !(parseInt(fadeSpeed) > 0) ? 20 : parseInt(fadeSpeed);
 var fadeDelay = !(parseInt(fadeDelay) > 0) ? 300 : parseInt(fadeDelay);
+var lpmPause = typeof lpmPause === 'undefined' ? false : lpmPause;
 var useOnline = typeof useOnline === 'undefined' ? false : useOnline;
 var checkURL = typeof checkURL === 'undefined' ? '' : checkURL;
 var remoteURL = typeof remoteURL === 'undefined' ? 'https://cors-anywhere.herokuapp.com/e621.net/posts.json?tags=id:1229885&limit=1' : remoteURL;
 var blacklist = typeof blacklist === 'undefined' ? '' : blacklist;
 
+var enableLogic = true; // Disables all changing behavior, used w/ Xen HTML data observer
 var preventDoubleChange = false; // used for shaking compensation
 var elToUpdate = "bg2" // Determines which image to update next as we load 2 images at once
 var footerMap = {"bg": "bgFooter", "bg2": "bg2Footer"}
@@ -27,29 +29,40 @@ window.onload = function () {
   // Xen HTML really likes to reload widgets in its settings,
   // so we avoid getting rate limited when user is configuring it
   this.changeLocalWallpaper(true);
-  if (!checkURL) document.getElementById(footerMap['bg2']).innerHTML = 'Shake to load online images'
+  if (useOnline && !checkURL) document.getElementById(footerMap['bg2']).innerHTML = 'Shake to load online images'
   nextUpdate = addMinutes(new this.Date(), interval);
 };
 
 window.onresume = function () {
-  if (new this.Date() > nextUpdate) {
+  if (enableLogic && new this.Date() > nextUpdate) {
     this.changeAutoWallpaper(false);
     nextUpdate = addMinutes(new this.Date(), interval);
   }
 };
 
+// Monitor state changes for LPM pausing
+api.system.observeData(function (newData) {
+  if (lpmPause && (newData.isLowPowerModeEnabled || (useOnline && !newData.isNetworkConnected))) {
+    window.removeEventListener("devicemotion", handleMotionEvent, true);
+    enableLogic = false;
+  } else {
+    window.addEventListener("devicemotion", handleMotionEvent, true);
+    enableLogic = true;
+  }
+});
+
 // Shake the device to change wallpaper
-window.addEventListener(
-  'devicemotion',
-  function (e) {
-    x1 = e.accelerationIncludingGravity.x;
-    y1 = e.accelerationIncludingGravity.y;
-    z1 = e.accelerationIncludingGravity.z;
-  },
-  false
-);
+function handleMotionEvent(event) {
+  x1 = event.accelerationIncludingGravity.x;
+  y1 = event.accelerationIncludingGravity.y;
+  z1 = event.accelerationIncludingGravity.z;
+}
+
+window.addEventListener("devicemotion", handleMotionEvent, true);
 
 setInterval(function () {
+  if (!enableLogic) return;
+
   var change = Math.abs(x1 - x2 + y1 - y2 + z1 - z2);
 
   if (change > sensitivity) {
