@@ -20,5 +20,7 @@ else
     printf "No custom images have been added yet\nPlease add your images to /var/mobile/Library/WR_Pictures\n"
 fi
 
-sed "s/  const imageList =.*/  const imageList = $fileList/g" '/private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/WallpaperRoller.js.dist' > '/private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/WallpaperRoller.js'
-ln -s '/private/var/mobile/Library/WR_Pictures' '/private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/images' || true
+if ! sed "s/  const imageList =.*/  const imageList = $fileList/g" '/private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/WallpaperRoller.js.dist' > '/private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/WallpaperRoller.js'; then
+    echo "Unable to write to WallpaperRoller.js, please enter your root password to continue:"
+    su -c "sed \"s/  const imageList =.*/  const imageList = $fileList/g\" '/private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/WallpaperRoller.js.dist' > /private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/WallpaperRoller.js"
+fi

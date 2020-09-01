@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+# Fix borked install script from previous versions (<1.1.4)
+if [[ -L /private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/images/WR_Pictures ]] || [[ ! -L /private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/images ]]; then
+    echo "Corrupted Wallpaper Roller installation found, fixing..."
+    unlink /private/var/mobile/Library/WR_Pictures/WR_Pictures 2>/dev/null || true
+    unlink /private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/images/WR_Pictures 2>/dev/null || true
+    mv /private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/images/wr_welcome.jpg /private/var/mobile/Library/WR_Pictures/ 2>/dev/null || true
+    rmdir /private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/images 2>/dev/null || true
+fi
+
 ln -s '/private/var/mobile/Library/WR_Pictures' '/private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/images' 2>/dev/null || true
 chmod +x /usr/bin/wr-rescan
 /usr/bin/wr-rescan
+/usr/sbin/chown mobile:staff /private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/WallpaperRoller.js

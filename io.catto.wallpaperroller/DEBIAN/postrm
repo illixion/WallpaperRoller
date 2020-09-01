@@ -4,5 +4,5 @@ rm '/private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/WallpaperRol
 unlink '/private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/images' 2> /dev/null
 rmdir '/private/var/mobile/Library/Widgets/Backgrounds/WallpaperRoller/' 2> /dev/null
 unlink '/private/var/mobile/Library/WR_Pictures/WR_Pictures' 2> /dev/null || true
-rmdir '/private/var/mobile/Library/WR_Pictures/' 2> /dev/null
+rmdir '/private/var/mobile/Library/WR_Pictures/' 2> /dev/null || true
 exit 0
