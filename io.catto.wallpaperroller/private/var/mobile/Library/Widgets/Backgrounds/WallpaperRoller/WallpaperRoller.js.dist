@@ -69,6 +69,7 @@ setInterval(function () {
     if (preventDoubleChange) {
       preventDoubleChange = false;
     } else {
+      nextUpdate = addMinutes(new this.Date(), interval);
       changeAutoWallpaper(false);
       preventDoubleChange = true;
     }
